@@ -4,6 +4,6 @@
 
 export * from './Button';
 export * from './TimerDisplay';
-export * from './BackgroundScroll';
-export * from './BackgroundImage';
+export * from './BackgroundAnimation';
+export * from './TimeAnimation';
 export * from './CatAnimation';

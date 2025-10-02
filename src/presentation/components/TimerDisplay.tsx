@@ -29,16 +29,20 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
-    padding: theme.spacing.sm,
+    padding: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: 12,
+    minWidth: 80,
   },
   label: {
-    fontSize: theme.typography.fontSize.xs,
-    marginBottom: theme.spacing.xs,
+    fontSize: 10,
+    marginBottom: 2,
+    color: '#000',
   },
   time: {
-    fontSize: 28, // 커스텀 크기 유지 (화면에 맞춤)
+    fontSize: 18,
     fontWeight: theme.typography.fontWeight.bold,
+    color: '#000',
   },
 });

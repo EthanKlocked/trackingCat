@@ -3,17 +3,17 @@
  * 메인 산책 화면
  */
 
-import React, { useRef } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ActivityIndicator, Dimensions } from 'react-native';
 import { useTimer } from '../contexts';
-import { Button, TimerDisplay, BackgroundImage, CatAnimation } from '../components';
-import { BackgroundImageRef } from '../components/BackgroundImage';
+import { Button, TimerDisplay, CatAnimation, TimeAnimation } from '../components';
+import { DayCycleBackground } from '../backgrounds';
 import { theme } from '../theme';
 import { TimerStatus } from '../../constants';
 
-export const WalkScreen: React.FC = () => {
-  const backgroundRef = useRef<BackgroundImageRef>(null);
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+export const WalkScreen: React.FC = () => {
   const {
     timerState,
     currentWalkDuration,
@@ -54,9 +54,6 @@ export const WalkScreen: React.FC = () => {
       const session = await completeWalk();
       console.log('Walk completed:', session);
 
-      // 배경 애니메이션 리셋
-      backgroundRef.current?.reset();
-
       // TODO: 완료 애니메이션/이벤트 추가 가능
       // - 축하 메시지 표시
       // - 완료 사운드 재생
@@ -76,16 +73,39 @@ export const WalkScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* 배경 (전체 화면) */}
-      <BackgroundImage
-        ref={backgroundRef}
-        isScrolling={timerState.status === TimerStatus.WALKING}
-      />
+      {/* 배경 (전체 화면) - 시간의 흐름 (IDLE이 아닐 때만 동작) */}
+      <TimeAnimation
+        isRunning={timerState.status !== TimerStatus.IDLE}
+        shouldReset={timerState.status === TimerStatus.IDLE}
+        screenWidth={SCREEN_WIDTH}
+      >
+        {(scrollX, virtualWidth) => (
+          <DayCycleBackground scrollX={scrollX} virtualWidth={virtualWidth} />
+        )}
+      </TimeAnimation>
 
-      {/* 헤더 (상단 고정) */}
-      <View style={styles.header}>
-        <Text style={styles.title}>🐱 산책하는 고양이</Text>
-      </View>
+      {/* 헤더 (상단 고정) - IDLE 상태에서만 표시 */}
+      {timerState.status === TimerStatus.IDLE && (
+        <View style={styles.header}>
+          <Text style={styles.title}>Tracking Cat</Text>
+        </View>
+      )}
+
+      {/* 타이머 표시 - 상단 좌우 배치 */}
+      {timerState.status !== TimerStatus.IDLE && (
+        <View style={styles.topTimerContainer}>
+          <TimerDisplay
+            duration={currentWalkDuration}
+            label="Working"
+            color={theme.colors.walking}
+          />
+          <TimerDisplay
+            duration={currentRestDuration}
+            label="Relaxing"
+            color={theme.colors.resting}
+          />
+        </View>
+      )}
 
       {/* 애니메이션 영역 (중앙 고정) */}
       <View style={styles.animationArea}>
@@ -97,21 +117,6 @@ export const WalkScreen: React.FC = () => {
 
       {/* 하단 고정 영역 */}
       <View style={styles.bottomContainer}>
-        {/* 타이머 표시 */}
-        {timerState.status !== TimerStatus.IDLE && (
-          <View style={styles.timerContainer}>
-            <TimerDisplay
-              duration={currentWalkDuration}
-              label="산책 시간"
-              color={theme.colors.walking}
-            />
-            <TimerDisplay
-              duration={currentRestDuration}
-              label="휴식 시간"
-              color={theme.colors.resting}
-            />
-          </View>
-        )}
 
         {/* 컨트롤 버튼 */}
         <View style={styles.controls}>
@@ -164,9 +169,19 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#2C3E50',
   },
+  topTimerContainer: {
+    position: 'absolute',
+    top: 60,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    zIndex: 1,
+  },
   animationArea: {
     position: 'absolute',
-    top: '35%',
+    top: '45%',
     left: 0,
     right: 0,
     height: 200,

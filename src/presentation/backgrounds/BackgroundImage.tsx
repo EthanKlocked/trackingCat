@@ -9,11 +9,13 @@ import { Image, StyleSheet, Animated, Dimensions, Easing } from 'react-native';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // 이미지 절대 경로로 import
-const backgroundImage = require('../../../assets/backgrounds/walking_path.png');
+// TODO: 사용 시 이미지 파일을 assets/backgrounds/ 에 추가하고 아래 주석 해제
+// const backgroundImage = require('../../../assets/backgrounds/your_image.jpg');
 
-// 이미지 원본 크기
-const IMAGE_WIDTH = 1024;
-const IMAGE_HEIGHT = 1024;
+// 이미지 원본 크기 (이미지에 맞게 수정)
+const IMAGE_WIDTH = 2752;
+const IMAGE_HEIGHT = 1536;
+const backgroundImage = null; // 임시: 이미지 없음
 
 // 화면 높이에 맞춘 이미지 너비 계산
 const scale = SCREEN_HEIGHT / IMAGE_HEIGHT;
