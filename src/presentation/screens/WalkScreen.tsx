@@ -6,7 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ActivityIndicator, Dimensions } from 'react-native';
 import { useTimer } from '../contexts';
-import { Button, TimerDisplay, CatAnimation, TimeAnimation } from '../components';
+import { Button, TimerDisplay, CatAnimation, TimeAnimation, CloudManager } from '../components';
 import { DayCycleBackground } from '../backgrounds';
 import { theme } from '../theme';
 import { TimerStatus } from '../../constants';
@@ -80,7 +80,13 @@ export const WalkScreen: React.FC = () => {
         screenWidth={SCREEN_WIDTH}
       >
         {(scrollX, virtualWidth) => (
-          <DayCycleBackground scrollX={scrollX} virtualWidth={virtualWidth} />
+          <>
+            <DayCycleBackground scrollX={scrollX} virtualWidth={virtualWidth} />
+            {/* 구름 애니메이션 (시간대별 투명도 적용) */}
+            {timerState.status !== TimerStatus.IDLE && (
+              <CloudManager status={timerState.status} scrollX={scrollX} virtualWidth={virtualWidth} />
+            )}
+          </>
         )}
       </TimeAnimation>
 

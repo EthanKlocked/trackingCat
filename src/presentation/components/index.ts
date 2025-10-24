@@ -7,3 +7,5 @@ export * from './TimerDisplay';
 export * from './BackgroundAnimation';
 export * from './TimeAnimation';
 export * from './CatAnimation';
+export * from './CloudAnimation';
+export * from './CloudManager';
