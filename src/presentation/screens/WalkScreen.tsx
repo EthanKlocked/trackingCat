@@ -3,15 +3,114 @@
  * 메인 산책 화면
  */
 
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ActivityIndicator, Dimensions } from 'react-native';
-import { useTimer } from '../contexts';
-import { Button, TimerDisplay, CatAnimation, TimeAnimation, CloudManager } from '../components';
-import { DayCycleBackground } from '../backgrounds';
-import { theme } from '../theme';
-import { TimerStatus } from '../../constants';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  ActivityIndicator,
+  Dimensions,
+  Animated,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useTimer } from "../contexts";
+import {
+  Button,
+  TimerDisplay,
+  CatAnimation,
+  TimeAnimation,
+  CloudManager,
+} from "../components";
+import { DayCycleBackground } from "../backgrounds";
+import { theme } from "../theme";
+import { TimerStatus } from "../../constants";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+// Animated LinearGradient
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
+
+// 시간대별 풀밭 색상 (초록 베이스 유지, 명암만 조절)
+const GROUND_COLORS = {
+  morning: ["rgba(168, 213, 186, 0)", "#A8D5BA", "#7CB342", "#558B2F"], // 기본 초록
+  day: ["rgba(180, 230, 200, 0)", "#B4E6C8", "#8BC34A", "#689F38"], // 밝은 초록
+  evening: ["rgba(150, 180, 150, 0)", "#96B496", "#6B9B6B", "#4A7C4A"], // 어두운 초록
+  night: ["rgba(60, 80, 60, 0)", "#3C503C", "#2D4A2D", "#1E3A1E"], // 매우 어두운 초록
+  dawn: ["rgba(120, 150, 130, 0)", "#789682", "#5A7A5A", "#3F5A3F"], // 중간 어두운 초록
+};
+
+interface DynamicGroundProps {
+  scrollX: Animated.Value;
+  virtualWidth: number;
+}
+
+const DynamicGround: React.FC<DynamicGroundProps> = ({
+  scrollX,
+  virtualWidth,
+}) => {
+  const progress = scrollX.interpolate({
+    inputRange: [-virtualWidth, 0],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
+
+  const topColor = progress.interpolate({
+    inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    outputRange: [
+      GROUND_COLORS.morning[0],
+      GROUND_COLORS.day[0],
+      GROUND_COLORS.evening[0],
+      GROUND_COLORS.night[0],
+      GROUND_COLORS.dawn[0],
+      GROUND_COLORS.morning[0],
+    ],
+  });
+
+  const color1 = progress.interpolate({
+    inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    outputRange: [
+      GROUND_COLORS.morning[1],
+      GROUND_COLORS.day[1],
+      GROUND_COLORS.evening[1],
+      GROUND_COLORS.night[1],
+      GROUND_COLORS.dawn[1],
+      GROUND_COLORS.morning[1],
+    ],
+  });
+
+  const color2 = progress.interpolate({
+    inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    outputRange: [
+      GROUND_COLORS.morning[2],
+      GROUND_COLORS.day[2],
+      GROUND_COLORS.evening[2],
+      GROUND_COLORS.night[2],
+      GROUND_COLORS.dawn[2],
+      GROUND_COLORS.morning[2],
+    ],
+  });
+
+  const bottomColor = progress.interpolate({
+    inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    outputRange: [
+      GROUND_COLORS.morning[3],
+      GROUND_COLORS.day[3],
+      GROUND_COLORS.evening[3],
+      GROUND_COLORS.night[3],
+      GROUND_COLORS.dawn[3],
+      GROUND_COLORS.morning[3],
+    ],
+  });
+
+  return (
+    <AnimatedLinearGradient
+      colors={[topColor, color1, color2, bottomColor]}
+      style={styles.ground}
+      locations={[0, 0.05, 0.3, 1]}
+    />
+  );
+};
 
 export const WalkScreen: React.FC = () => {
   const {
@@ -29,7 +128,7 @@ export const WalkScreen: React.FC = () => {
     try {
       await startWalk();
     } catch (error) {
-      console.error('Failed to start walk:', error);
+      console.error("Failed to start walk:", error);
     }
   };
 
@@ -37,7 +136,7 @@ export const WalkScreen: React.FC = () => {
     try {
       await pauseWalk();
     } catch (error) {
-      console.error('Failed to pause walk:', error);
+      console.error("Failed to pause walk:", error);
     }
   };
 
@@ -45,21 +144,19 @@ export const WalkScreen: React.FC = () => {
     try {
       await resumeWalk();
     } catch (error) {
-      console.error('Failed to resume walk:', error);
+      console.error("Failed to resume walk:", error);
     }
   };
 
   const handleComplete = async () => {
     try {
-      const session = await completeWalk();
-      console.log('Walk completed:', session);
-
+      await completeWalk();
       // TODO: 완료 애니메이션/이벤트 추가 가능
       // - 축하 메시지 표시
       // - 완료 사운드 재생
       // - 결과 화면으로 이동 등
     } catch (error) {
-      console.error('Failed to complete walk:', error);
+      console.error("Failed to complete walk:", error);
     }
   };
 
@@ -84,8 +181,14 @@ export const WalkScreen: React.FC = () => {
             <DayCycleBackground scrollX={scrollX} virtualWidth={virtualWidth} />
             {/* 구름 애니메이션 (시간대별 투명도 적용) */}
             {timerState.status !== TimerStatus.IDLE && (
-              <CloudManager status={timerState.status} scrollX={scrollX} virtualWidth={virtualWidth} />
+              <CloudManager
+                status={timerState.status}
+                scrollX={scrollX}
+                virtualWidth={virtualWidth}
+              />
             )}
+            {/* 풀밭 바닥 - 시간대별 색상 변경 */}
+            <DynamicGround scrollX={scrollX} virtualWidth={virtualWidth} />
           </>
         )}
       </TimeAnimation>
@@ -113,6 +216,8 @@ export const WalkScreen: React.FC = () => {
         </View>
       )}
 
+      {/* 풀밭 바닥 - TimeAnimation 내부로 이동하여 scrollX 전달 */}
+
       {/* 애니메이션 영역 (중앙 고정) */}
       <View style={styles.animationArea}>
         <CatAnimation status={timerState.status} />
@@ -123,7 +228,6 @@ export const WalkScreen: React.FC = () => {
 
       {/* 하단 고정 영역 */}
       <View style={styles.bottomContainer}>
-
         {/* 컨트롤 버튼 */}
         <View style={styles.controls}>
           {timerState.status === TimerStatus.IDLE && (
@@ -132,7 +236,11 @@ export const WalkScreen: React.FC = () => {
 
           {timerState.status === TimerStatus.WALKING && (
             <>
-              <Button title="잠깐 쉼" onPress={handlePause} variant="secondary" />
+              <Button
+                title="잠깐 쉼"
+                onPress={handlePause}
+                variant="secondary"
+              />
               <Button
                 title="산책 완료"
                 onPress={handleComplete}
@@ -144,7 +252,11 @@ export const WalkScreen: React.FC = () => {
 
           {timerState.status === TimerStatus.RESTING && (
             <>
-              <Button title="산책 재개" onPress={handleResume} variant="primary" />
+              <Button
+                title="산책 재개"
+                onPress={handleResume}
+                variant="primary"
+              />
               <Button
                 title="산책 완료"
                 onPress={handleComplete}
@@ -167,39 +279,46 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 32,
     paddingHorizontal: 24,
-    alignItems: 'center',
+    alignItems: "center",
     zIndex: 1,
   },
   title: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#2C3E50',
+    fontWeight: "700",
+    color: "#2C3E50",
   },
   topTimerContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 60,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 24,
     zIndex: 1,
   },
   animationArea: {
-    position: 'absolute',
-    top: '45%',
+    position: "absolute",
+    top: "55%",
     left: 0,
     right: 0,
     height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   statusText: {
     fontSize: 18,
-    color: '#7F8C8D',
+    color: "#7F8C8D",
+  },
+  ground: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 330,
   },
   bottomContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
@@ -208,8 +327,8 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   timerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginBottom: 24,
   },
   controls: {

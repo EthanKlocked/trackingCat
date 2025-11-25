@@ -3,13 +3,13 @@
  * 하루 사이클 그라디언트 배경 (아침→낮→저녁→밤→새벽)
  */
 
-import React from 'react';
-import { StyleSheet, Animated, Dimensions, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import LottieView from 'lottie-react-native';
-import { BackgroundProps } from './types';
+import React from "react";
+import { StyleSheet, Animated, Dimensions, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import LottieView from "lottie-react-native";
+import { BackgroundProps } from "./types";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 // Animated LinearGradient 생성
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
@@ -17,38 +17,41 @@ const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 // 하루 사이클 색상 정의 (5개 섹션)
 const DAY_CYCLE_COLORS = {
   morning: {
-    top: '#FFE5B4',    // 연한 복숭아색
-    middle: '#FFD89B', // 밝은 주황
-    bottom: '#87CEEB', // 하늘색
+    top: "#FFE5B4", // 연한 복숭아색
+    middle: "#FFD89B", // 밝은 주황
+    bottom: "#87CEEB", // 하늘색
   },
   day: {
-    top: '#87CEEB',    // 밝은 하늘색
-    middle: '#B0E0E6', // 파우더 블루
-    bottom: '#4A90E2', // 파란색
+    top: "#87CEEB", // 밝은 하늘색
+    middle: "#B0E0E6", // 파우더 블루
+    bottom: "#4A90E2", // 파란색
   },
   evening: {
-    top: '#FF6B9D',    // 핑크
-    middle: '#FFA07A', // 연어색
-    bottom: '#FF8C42', // 주황
+    top: "#FF6B9D", // 핑크
+    middle: "#FFA07A", // 연어색
+    bottom: "#FF8C42", // 주황
   },
   night: {
-    top: '#1a1a2e',    // 진한 네이비
-    middle: '#16213e', // 어두운 파랑
-    bottom: '#0f3460', // 미드나잇 블루
+    top: "#1a1a2e", // 진한 네이비
+    middle: "#16213e", // 어두운 파랑
+    bottom: "#0f3460", // 미드나잇 블루
   },
   dawn: {
-    top: '#2d3561',    // 어두운 보라
-    middle: '#5C4D7D', // 보라
-    bottom: '#c05c7e', // 장미빛
+    top: "#2d3561", // 어두운 보라
+    middle: "#5C4D7D", // 보라
+    bottom: "#c05c7e", // 장미빛
   },
 };
 
-export const DayCycleBackground: React.FC<BackgroundProps> = ({ scrollX, virtualWidth }) => {
+export const DayCycleBackground: React.FC<BackgroundProps> = ({
+  scrollX,
+  virtualWidth,
+}) => {
   // scrollX를 0~1 비율로 변환 (-virtualWidth → 0 = 1 → 0)
   const progress = scrollX.interpolate({
     inputRange: [-virtualWidth, 0],
     outputRange: [1, 0],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
   // 5개 섹션으로 나눔 (각 0.2)
@@ -100,13 +103,13 @@ export const DayCycleBackground: React.FC<BackgroundProps> = ({ scrollX, virtual
   const sunOpacity = progress.interpolate({
     inputRange: [0, 0.05, 0.35, 0.4],
     outputRange: [0, 1, 1, 0],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
   const moonOpacity = progress.interpolate({
     inputRange: [0.5, 0.55, 0.95, 1.0],
     outputRange: [0, 1, 1, 0],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
   // 해/달 위치 (화면을 가로질러 이동)
@@ -114,14 +117,14 @@ export const DayCycleBackground: React.FC<BackgroundProps> = ({ scrollX, virtual
   const sunPosition = progress.interpolate({
     inputRange: [0, 0.2, 0.4],
     outputRange: [-50, SCREEN_WIDTH / 2 - 40, SCREEN_WIDTH + 50],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
   // 달: 밤 시작(0.6)에서 새벽 끝(1.0)까지 왼쪽에서 오른쪽으로
   const moonPosition = progress.interpolate({
     inputRange: [0.5, 0.7, 1.0],
     outputRange: [-50, SCREEN_WIDTH / 2 - 40, SCREEN_WIDTH + 50],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
   return (
@@ -143,7 +146,7 @@ export const DayCycleBackground: React.FC<BackgroundProps> = ({ scrollX, virtual
         ]}
       >
         <LottieView
-          source={require('../../../assets/animations/sun.json')}
+          source={require("../../../assets/lotties/sun.json")}
           autoPlay
           loop
           style={styles.sunMoon}
@@ -161,7 +164,7 @@ export const DayCycleBackground: React.FC<BackgroundProps> = ({ scrollX, virtual
         ]}
       >
         <LottieView
-          source={require('../../../assets/animations/moon.json')}
+          source={require("../../../assets/lotties/moon.json")}
           autoPlay
           loop
           style={styles.sunMoon}
@@ -173,14 +176,14 @@ export const DayCycleBackground: React.FC<BackgroundProps> = ({ scrollX, virtual
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     left: 0,
     top: 0,
   },
   celestialBody: {
-    position: 'absolute',
+    position: "absolute",
     top: 140,
     right: 40,
   },

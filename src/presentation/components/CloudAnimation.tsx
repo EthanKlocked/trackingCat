@@ -3,11 +3,11 @@
  * 단일 구름 애니메이션 (오른쪽→왼쪽)
  */
 
-import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, StyleSheet } from 'react-native';
-import LottieView from 'lottie-react-native';
+import React, { useEffect, useRef } from "react";
+import { Animated, Dimensions, StyleSheet } from "react-native";
+import LottieView from "lottie-react-native";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface CloudAnimationProps {
   delay: number; // 시작 지연 시간 (ms)
@@ -76,8 +76,8 @@ export const CloudAnimation: React.FC<CloudAnimationProps> = ({
     translateX.stopAnimation((currentValue) => {
       const remainingDistance = Math.abs(currentValue - (-size - 50));
       const totalDistance = SCREEN_WIDTH + size + 50;
-      const progress = 1 - (remainingDistance / totalDistance);
-      const remainingDuration = duration * (1 - progress) / speedMultiplier;
+      const progress = 1 - remainingDistance / totalDistance;
+      const remainingDuration = (duration * (1 - progress)) / speedMultiplier;
 
       // 새로운 속도로 애니메이션 재시작
       animationRef.current = Animated.timing(translateX, {
@@ -107,7 +107,7 @@ export const CloudAnimation: React.FC<CloudAnimationProps> = ({
       ]}
     >
       <LottieView
-        source={require('../../../assets/animations/cloud.json')}
+        source={require("../../../assets/lotties/cloud.json")}
         autoPlay
         loop
         style={[styles.cloud, { width: size, height: size }]}
@@ -118,7 +118,7 @@ export const CloudAnimation: React.FC<CloudAnimationProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
   },
   cloud: {
